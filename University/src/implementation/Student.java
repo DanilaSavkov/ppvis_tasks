@@ -29,7 +29,7 @@ public class Student implements AbstractStudent {
     }
 
     @Override
-    public void setStatus(Boolean status) {
+    public synchronized void setStatus(Boolean status) {
         this.status = status;
     }
 }

@@ -40,13 +40,13 @@ public class UniversityDB implements AbstractUniversityDB {
     }
 
     @Override
-    public void addGroup(AbstractGroup group) throws GroupAlreadyExistsException {
+    public synchronized void addGroup(AbstractGroup group) throws GroupAlreadyExistsException {
         if (groups.contains(group)) throw new GroupAlreadyExistsException();
         else groups.add(group);
     }
 
     @Override
-    public void removeGroup(AbstractGroup group) throws GroupNotFoundException {
+    public synchronized void removeGroup(AbstractGroup group) throws GroupNotFoundException {
         if (!groups.contains(group)) throw new GroupNotFoundException();
         else groups.remove(group);
     }
@@ -61,9 +61,12 @@ public class UniversityDB implements AbstractUniversityDB {
         else return result;
     }
 
+//    метод UniversityDB.addStudentToGroup(AbstractStudent student, AbstractGroup group) не synchronized потому что
+//    к данной функции в БД могут получить доступ одновременно несколько акторов, однако добавить студента в
+//    конкретную группу, только один, поэтому метод Group.addStudent(AbstractStudent student) помечен как synchronized.
     @Override
-    public void addStudentToGroup(AbstractStudent student, AbstractGroup group) throws StudentAlreadyExistsException,
-            GroupNotFoundException {
+    public void addStudentToGroup(AbstractStudent student, AbstractGroup group)
+            throws StudentAlreadyExistsException, GroupNotFoundException {
         if (!groups.contains(group)) throw new GroupNotFoundException();
         else group.addStudent(student);
     }
@@ -83,9 +86,11 @@ public class UniversityDB implements AbstractUniversityDB {
         else return result;
     }
 
+    // тут вроде аналогично с UniversityDB.addStudentToGroup(AbstractStudent student, AbstractGroup group), но на
+    // всякий случай пусть будет :/
     @Override
-    public void moveStudentToGroup(AbstractStudent student, AbstractGroup target) throws StudentNotFoundException,
-            GroupNotFoundException, StudentAlreadyExistsException {
+    public synchronized void moveStudentToGroup(AbstractStudent student, AbstractGroup target)
+            throws StudentNotFoundException, GroupNotFoundException, StudentAlreadyExistsException {
         if (!groups.contains(target)) throw new GroupNotFoundException();
         else {
             try {

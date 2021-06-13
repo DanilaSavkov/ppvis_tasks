@@ -33,13 +33,13 @@ public class Group implements AbstractGroup {
     }
 
     @Override
-    public void addStudent(AbstractStudent student) throws StudentAlreadyExistsException {
+    public synchronized void addStudent(AbstractStudent student) throws StudentAlreadyExistsException {
         if (contains(student)) throw new StudentAlreadyExistsException();
         else students.add(student);
     }
 
     @Override
-    public void removeStudent(AbstractStudent student) throws StudentNotFoundException {
+    public synchronized void removeStudent(AbstractStudent student) throws StudentNotFoundException {
         if (!contains(student)) throw new StudentNotFoundException();
         else students.remove(student);
     }
@@ -65,7 +65,7 @@ public class Group implements AbstractGroup {
     }
 
     @Override
-    public void setCourse(Integer course) {
+    public synchronized void setCourse(Integer course) {
         this.course = course;
     }
 
