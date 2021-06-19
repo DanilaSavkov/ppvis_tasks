@@ -106,8 +106,9 @@ public class UniversityDB implements AbstractUniversityDB {
     @Override
     public void setStudentStatus(AbstractStudent student, Boolean status) throws StudentNotFoundException {
         try {
-            getStudentGroup(student);
+            AbstractGroup group = getStudentGroup(student);
             student.setStatus(status);
+            if (!status) group.removeStudent(student);
         } catch (GroupNotFoundException e) {
             throw new StudentNotFoundException(e);
         }
