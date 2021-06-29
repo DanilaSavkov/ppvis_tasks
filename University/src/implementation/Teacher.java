@@ -19,7 +19,7 @@ public class Teacher implements AbstractTeacher {
 
     @Override
     public List<AbstractStudent> getStudentsByGroup(AbstractGroup group) throws GroupNotFoundException {
-        return universityDB.getStudentsByGroup(group);
+        return universityDB.getStudentsFromGroup(group);
     }
 
     @Override

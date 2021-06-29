@@ -11,9 +11,9 @@ import java.util.List;
 public class Group implements AbstractGroup {
     private final List<AbstractStudent> students;
     private final String name;
-    private Integer course;
+    private int course;
 
-    public Group(String name, Integer course) {
+    public Group(String name, int course) {
         this.name = name;
         this.course = course;
         students = new ArrayList<>();
@@ -34,7 +34,7 @@ public class Group implements AbstractGroup {
 
     @Override
     public synchronized void addStudent(AbstractStudent student) throws StudentAlreadyExistsException {
-        if (contains(student)) throw new StudentAlreadyExistsException();
+        if (containsSameSurname(student)) throw new StudentAlreadyExistsException();
         else students.add(student);
     }
 
@@ -55,7 +55,7 @@ public class Group implements AbstractGroup {
     }
 
     @Override
-    public Integer getCourse() {
+    public int getCourse() {
         return course;
     }
 
@@ -65,12 +65,14 @@ public class Group implements AbstractGroup {
     }
 
     @Override
-    public synchronized void setCourse(Integer course) {
-        this.course = course;
-    }
-
-    @Override
     public boolean contains(AbstractStudent student) {
         return students.contains(student);
+    }
+
+    private boolean containsSameSurname(AbstractStudent student) {
+        for (AbstractStudent abstractStudent : students) {
+            if (student.hasSameSurname(abstractStudent)) return true;
+        }
+        return false;
     }
 }

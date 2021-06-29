@@ -5,7 +5,9 @@ public interface AbstractStudent {
 
     String getCity();
 
-    Boolean getStatus();
+    boolean isStudying();
 
-    void setStatus(Boolean status);
+    void setStudying(boolean status);
+
+    boolean hasSameSurname(AbstractStudent student);
 }

@@ -1,15 +1,12 @@
 package abstraction;
 
-import exception.GroupAlreadyExistsException;
-import exception.GroupNotFoundException;
-import exception.StudentAlreadyExistsException;
-import exception.StudentNotFoundException;
+import exception.*;
 
 import java.util.List;
 import java.util.Map;
 
 public interface AbstractUniversityDB {
-    List<AbstractStudent> getStudentsByGroup(AbstractGroup group) throws GroupNotFoundException;
+    List<AbstractStudent> getStudentsFromGroup(AbstractGroup group) throws GroupNotFoundException;
 
     Map<AbstractStudent, AbstractGroup> searchStudentsBySurname(String surname) throws StudentNotFoundException;
 
@@ -17,7 +14,7 @@ public interface AbstractUniversityDB {
 
     void removeGroup(AbstractGroup group) throws GroupNotFoundException;
 
-    List<AbstractStudent> getStudentsByCourse(Integer course) throws StudentNotFoundException;
+    List<AbstractStudent> getStudentsByCourse(int course) throws StudentNotFoundException;
 
     void addStudentToGroup(AbstractStudent student, AbstractGroup group) throws StudentAlreadyExistsException,
             GroupNotFoundException;
@@ -25,7 +22,7 @@ public interface AbstractUniversityDB {
     Map<AbstractStudent, AbstractGroup> searchStudentsByCity(String city) throws StudentNotFoundException;
 
     void moveStudentToGroup(AbstractStudent student, AbstractGroup target) throws StudentNotFoundException,
-            GroupNotFoundException, StudentAlreadyExistsException;
+            GroupNotFoundException, StudentAlreadyExistsException, StudentNotStudyingException;
 
-    void setStudentStatus(AbstractStudent student, Boolean status) throws StudentNotFoundException;
+    void changeStudentStatus(AbstractStudent student, boolean status) throws StudentNotFoundException;
 }

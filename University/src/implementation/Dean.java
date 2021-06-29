@@ -7,6 +7,7 @@ import abstraction.AbstractUniversityDB;
 import exception.GroupNotFoundException;
 import exception.StudentAlreadyExistsException;
 import exception.StudentNotFoundException;
+import exception.StudentNotStudyingException;
 
 import java.util.Map;
 
@@ -18,8 +19,8 @@ public class Dean implements AbstractDean {
     }
 
     @Override
-    public void setStudentStatus(AbstractStudent student, Boolean status) throws StudentNotFoundException {
-        universityDB.setStudentStatus(student, status);
+    public void changeStudentStatus(AbstractStudent student, boolean status) throws StudentNotFoundException {
+        universityDB.changeStudentStatus(student, status);
     }
 
     @Override
@@ -28,8 +29,8 @@ public class Dean implements AbstractDean {
     }
 
     @Override
-    public void moveStudent(AbstractStudent student, AbstractGroup target) throws StudentNotFoundException,
-            StudentAlreadyExistsException, GroupNotFoundException {
+    public void moveStudentToGroup(AbstractStudent student, AbstractGroup target) throws StudentNotFoundException,
+            StudentAlreadyExistsException, GroupNotFoundException, StudentNotStudyingException {
         universityDB.moveStudentToGroup(student, target);
     }
 

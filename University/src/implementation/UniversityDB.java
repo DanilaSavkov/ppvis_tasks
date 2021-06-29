@@ -3,31 +3,27 @@ package implementation;
 import abstraction.AbstractGroup;
 import abstraction.AbstractStudent;
 import abstraction.AbstractUniversityDB;
-import exception.GroupAlreadyExistsException;
-import exception.GroupNotFoundException;
-import exception.StudentAlreadyExistsException;
-import exception.StudentNotFoundException;
+import exception.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UniversityDB implements AbstractUniversityDB {
-    private final List<AbstractGroup> groups;
+    private final Map<Integer, LinkedList<AbstractGroup>> data;
 
     public UniversityDB() {
-        groups = new ArrayList<>();
+        data = new HashMap<>();
     }
 
     @Override
-    public List<AbstractStudent> getStudentsByGroup(AbstractGroup group) throws GroupNotFoundException {
+    public List<AbstractStudent> getStudentsFromGroup(AbstractGroup group) throws GroupNotFoundException {
+        List<AbstractGroup> groups = getGroupsByCourse(group.getCourse());
         if (!groups.contains(group)) throw new GroupNotFoundException();
         else return group.getStudents();
     }
 
     @Override
     public Map<AbstractStudent, AbstractGroup> searchStudentsBySurname(String surname) throws StudentNotFoundException {
+        List<AbstractGroup> groups = getGroups();
         Map<AbstractStudent, AbstractGroup> result = new HashMap<>();
         for (AbstractGroup group : groups) {
             try {
@@ -41,38 +37,40 @@ public class UniversityDB implements AbstractUniversityDB {
 
     @Override
     public synchronized void addGroup(AbstractGroup group) throws GroupAlreadyExistsException {
+        List<AbstractGroup> groups = getGroupsByCourse(group.getCourse());
         if (groups.contains(group)) throw new GroupAlreadyExistsException();
         else groups.add(group);
     }
 
     @Override
     public synchronized void removeGroup(AbstractGroup group) throws GroupNotFoundException {
+        List<AbstractGroup> groups = getGroupsByCourse(group.getCourse());
         if (!groups.contains(group)) throw new GroupNotFoundException();
         else groups.remove(group);
     }
 
     @Override
-    public List<AbstractStudent> getStudentsByCourse(Integer course) throws StudentNotFoundException {
+    public List<AbstractStudent> getStudentsByCourse(int course) throws StudentNotFoundException {
+        List<AbstractGroup> groups = getGroupsByCourse(course);
         List<AbstractStudent> result = new ArrayList<>();
         for (AbstractGroup group : groups) {
-            if (course.equals(group.getCourse())) result.addAll(group.getStudents());
+            result.addAll(group.getStudents());
         }
         if (result.isEmpty()) throw new StudentNotFoundException();
         else return result;
     }
 
-//    метод UniversityDB.addStudentToGroup(AbstractStudent student, AbstractGroup group) не synchronized потому что
-//    к данной функции в БД могут получить доступ одновременно несколько акторов, однако добавить студента в
-//    конкретную группу, только один, поэтому метод Group.addStudent(AbstractStudent student) помечен как synchronized.
     @Override
     public void addStudentToGroup(AbstractStudent student, AbstractGroup group)
             throws StudentAlreadyExistsException, GroupNotFoundException {
+        List<AbstractGroup> groups = getGroupsByCourse(group.getCourse());
         if (!groups.contains(group)) throw new GroupNotFoundException();
         else group.addStudent(student);
     }
 
     @Override
     public Map<AbstractStudent, AbstractGroup> searchStudentsByCity(String city) throws StudentNotFoundException {
+        List<AbstractGroup> groups = getGroups();
         Map<AbstractStudent, AbstractGroup> result = new HashMap<>();
         for (AbstractGroup group : groups) {
             try {
@@ -86,11 +84,12 @@ public class UniversityDB implements AbstractUniversityDB {
         else return result;
     }
 
-    // тут вроде аналогично с UniversityDB.addStudentToGroup(AbstractStudent student, AbstractGroup group), но на
-    // всякий случай пусть будет :/
     @Override
     public synchronized void moveStudentToGroup(AbstractStudent student, AbstractGroup target)
-            throws StudentNotFoundException, GroupNotFoundException, StudentAlreadyExistsException {
+            throws StudentNotFoundException, GroupNotFoundException, StudentAlreadyExistsException,
+            StudentNotStudyingException {
+        if (!student.isStudying()) throw new StudentNotStudyingException();
+        List<AbstractGroup> groups = getGroupsByCourse(target.getCourse());
         if (!groups.contains(target)) throw new GroupNotFoundException();
         else {
             try {
@@ -104,10 +103,10 @@ public class UniversityDB implements AbstractUniversityDB {
     }
 
     @Override
-    public void setStudentStatus(AbstractStudent student, Boolean status) throws StudentNotFoundException {
+    public void changeStudentStatus(AbstractStudent student, boolean status) throws StudentNotFoundException {
         try {
             AbstractGroup group = getStudentGroup(student);
-            student.setStatus(status);
+            student.setStudying(status);
             if (!status) group.removeStudent(student);
         } catch (GroupNotFoundException e) {
             throw new StudentNotFoundException(e);
@@ -115,6 +114,7 @@ public class UniversityDB implements AbstractUniversityDB {
     }
 
     private AbstractGroup getStudentGroup(AbstractStudent student) throws GroupNotFoundException {
+        List<AbstractGroup> groups = getGroups();
         AbstractGroup result = null;
         for (AbstractGroup group : groups) {
             if (group.contains(student)) {
@@ -124,5 +124,17 @@ public class UniversityDB implements AbstractUniversityDB {
         }
         if (result == null) throw new GroupNotFoundException();
         else return result;
+    }
+
+    private List<AbstractGroup> getGroupsByCourse(int course) {
+        return data.get(course);
+    }
+
+    private List<AbstractGroup> getGroups() {
+        List<AbstractGroup> result = new ArrayList<>();
+        for (List<AbstractGroup> groups : data.values()) {
+            result.addAll(groups);
+        }
+        return result;
     }
 }

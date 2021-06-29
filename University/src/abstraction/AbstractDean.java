@@ -3,14 +3,15 @@ package abstraction;
 import exception.GroupNotFoundException;
 import exception.StudentAlreadyExistsException;
 import exception.StudentNotFoundException;
+import exception.StudentNotStudyingException;
 
 import java.util.Map;
 
 public interface AbstractDean extends UniversityWorker {
-    void setStudentStatus(AbstractStudent student, Boolean status) throws StudentNotFoundException;
+    void changeStudentStatus(AbstractStudent student, boolean status) throws StudentNotFoundException;
 
     Map<AbstractStudent, AbstractGroup> searchStudentsByCity(String city) throws StudentNotFoundException;
 
-    void moveStudent(AbstractStudent student, AbstractGroup target) throws StudentNotFoundException,
-            StudentAlreadyExistsException, GroupNotFoundException;
+    void moveStudentToGroup(AbstractStudent student, AbstractGroup target) throws StudentNotFoundException,
+            StudentAlreadyExistsException, GroupNotFoundException, StudentNotStudyingException;
 }
