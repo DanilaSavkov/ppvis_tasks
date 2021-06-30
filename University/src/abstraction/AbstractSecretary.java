@@ -8,13 +8,13 @@ import exception.StudentNotFoundException;
 import java.util.List;
 
 public interface AbstractSecretary extends UniversityWorker {
-    void createGroup(String name, int course) throws GroupAlreadyExistsException;
+    void createGroup(String name, Integer course) throws GroupAlreadyExistsException;
 
-    void removeGroup(AbstractGroup group) throws GroupNotFoundException;
+    void remoteGroup(AbstractGroup group) throws GroupNotFoundException;
 
-    List<AbstractStudent> getStudentsFromGroup(AbstractGroup group) throws GroupNotFoundException;
+    List<AbstractStudent> getStudentsByGroup(AbstractGroup group) throws GroupNotFoundException;
 
-    List<AbstractStudent> getStudentsByCourse(int course) throws StudentNotFoundException;
+    List<AbstractStudent> getStudentsByCourse(Integer course) throws StudentNotFoundException;
 
     void addStudentToGroup(AbstractStudent student, AbstractGroup group) throws StudentAlreadyExistsException,
             GroupNotFoundException;

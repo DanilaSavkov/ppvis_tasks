@@ -3,27 +3,31 @@ package implementation;
 import abstraction.AbstractGroup;
 import abstraction.AbstractStudent;
 import abstraction.AbstractUniversityDB;
-import exception.*;
+import exception.GroupAlreadyExistsException;
+import exception.GroupNotFoundException;
+import exception.StudentAlreadyExistsException;
+import exception.StudentNotFoundException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UniversityDB implements AbstractUniversityDB {
-    private final Map<Integer, LinkedList<AbstractGroup>> data;
+    private final List<AbstractGroup> groups;
 
     public UniversityDB() {
-        data = new HashMap<>();
+        groups = new ArrayList<>();
     }
 
     @Override
-    public List<AbstractStudent> getStudentsFromGroup(AbstractGroup group) throws GroupNotFoundException {
-        List<AbstractGroup> groups = getGroupsByCourse(group.getCourse());
+    public List<AbstractStudent> getStudentsByGroup(AbstractGroup group) throws GroupNotFoundException {
         if (!groups.contains(group)) throw new GroupNotFoundException();
         else return group.getStudents();
     }
 
     @Override
     public Map<AbstractStudent, AbstractGroup> searchStudentsBySurname(String surname) throws StudentNotFoundException {
-        List<AbstractGroup> groups = getGroups();
         Map<AbstractStudent, AbstractGroup> result = new HashMap<>();
         for (AbstractGroup group : groups) {
             try {
@@ -37,24 +41,21 @@ public class UniversityDB implements AbstractUniversityDB {
 
     @Override
     public synchronized void addGroup(AbstractGroup group) throws GroupAlreadyExistsException {
-        List<AbstractGroup> groups = getGroupsByCourse(group.getCourse());
         if (groups.contains(group)) throw new GroupAlreadyExistsException();
         else groups.add(group);
     }
 
     @Override
     public synchronized void removeGroup(AbstractGroup group) throws GroupNotFoundException {
-        List<AbstractGroup> groups = getGroupsByCourse(group.getCourse());
         if (!groups.contains(group)) throw new GroupNotFoundException();
         else groups.remove(group);
     }
 
     @Override
-    public List<AbstractStudent> getStudentsByCourse(int course) throws StudentNotFoundException {
-        List<AbstractGroup> groups = getGroupsByCourse(course);
+    public List<AbstractStudent> getStudentsByCourse(Integer course) throws StudentNotFoundException {
         List<AbstractStudent> result = new ArrayList<>();
         for (AbstractGroup group : groups) {
-            result.addAll(group.getStudents());
+            if (course.equals(group.getCourse())) result.addAll(group.getStudents());
         }
         if (result.isEmpty()) throw new StudentNotFoundException();
         else return result;
@@ -63,14 +64,12 @@ public class UniversityDB implements AbstractUniversityDB {
     @Override
     public void addStudentToGroup(AbstractStudent student, AbstractGroup group)
             throws StudentAlreadyExistsException, GroupNotFoundException {
-        List<AbstractGroup> groups = getGroupsByCourse(group.getCourse());
         if (!groups.contains(group)) throw new GroupNotFoundException();
         else group.addStudent(student);
     }
 
     @Override
     public Map<AbstractStudent, AbstractGroup> searchStudentsByCity(String city) throws StudentNotFoundException {
-        List<AbstractGroup> groups = getGroups();
         Map<AbstractStudent, AbstractGroup> result = new HashMap<>();
         for (AbstractGroup group : groups) {
             try {
@@ -86,10 +85,7 @@ public class UniversityDB implements AbstractUniversityDB {
 
     @Override
     public synchronized void moveStudentToGroup(AbstractStudent student, AbstractGroup target)
-            throws StudentNotFoundException, GroupNotFoundException, StudentAlreadyExistsException,
-            StudentNotStudyingException {
-        if (!student.isStudying()) throw new StudentNotStudyingException();
-        List<AbstractGroup> groups = getGroupsByCourse(target.getCourse());
+            throws StudentNotFoundException, GroupNotFoundException, StudentAlreadyExistsException {
         if (!groups.contains(target)) throw new GroupNotFoundException();
         else {
             try {
@@ -103,18 +99,16 @@ public class UniversityDB implements AbstractUniversityDB {
     }
 
     @Override
-    public void changeStudentStatus(AbstractStudent student, boolean status) throws StudentNotFoundException {
+    public void setStudentStatus(AbstractStudent student, Boolean status) throws StudentNotFoundException {
         try {
-            AbstractGroup group = getStudentGroup(student);
-            student.setStudying(status);
-            if (!status) group.removeStudent(student);
+            getStudentGroup(student);
+            student.setStatus(status);
         } catch (GroupNotFoundException e) {
             throw new StudentNotFoundException(e);
         }
     }
 
     private AbstractGroup getStudentGroup(AbstractStudent student) throws GroupNotFoundException {
-        List<AbstractGroup> groups = getGroups();
         AbstractGroup result = null;
         for (AbstractGroup group : groups) {
             if (group.contains(student)) {
@@ -124,17 +118,5 @@ public class UniversityDB implements AbstractUniversityDB {
         }
         if (result == null) throw new GroupNotFoundException();
         else return result;
-    }
-
-    private List<AbstractGroup> getGroupsByCourse(int course) {
-        return data.get(course);
-    }
-
-    private List<AbstractGroup> getGroups() {
-        List<AbstractGroup> result = new ArrayList<>();
-        for (List<AbstractGroup> groups : data.values()) {
-            result.addAll(groups);
-        }
-        return result;
     }
 }

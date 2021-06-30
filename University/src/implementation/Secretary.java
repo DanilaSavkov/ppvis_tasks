@@ -19,23 +19,23 @@ public class Secretary implements AbstractSecretary {
     }
 
     @Override
-    public void createGroup(String name, int course) throws GroupAlreadyExistsException {
+    public void createGroup(String name, Integer course) throws GroupAlreadyExistsException {
         AbstractGroup group = new Group(name, course);
         universityDB.addGroup(group);
     }
 
     @Override
-    public void removeGroup(AbstractGroup group) throws GroupNotFoundException {
+    public void remoteGroup(AbstractGroup group) throws GroupNotFoundException {
         universityDB.removeGroup(group);
     }
 
     @Override
-    public List<AbstractStudent> getStudentsFromGroup(AbstractGroup group) throws GroupNotFoundException {
-        return universityDB.getStudentsFromGroup(group);
+    public List<AbstractStudent> getStudentsByGroup(AbstractGroup group) throws GroupNotFoundException {
+        return universityDB.getStudentsByGroup(group);
     }
 
     @Override
-    public List<AbstractStudent> getStudentsByCourse(int course) throws StudentNotFoundException {
+    public List<AbstractStudent> getStudentsByCourse(Integer course) throws StudentNotFoundException {
         return universityDB.getStudentsByCourse(course);
     }
 

@@ -5,12 +5,12 @@ import abstraction.AbstractStudent;
 public class Student implements AbstractStudent {
     private final String surname;
     private final String city;
-    private boolean studying;
+    private Boolean status;
 
     public Student(String surname, String city) {
         this.surname = surname;
         this.city = city;
-        studying = false;
+        status = false;
     }
 
     @Override
@@ -24,17 +24,12 @@ public class Student implements AbstractStudent {
     }
 
     @Override
-    public boolean isStudying() {
-        return studying;
+    public Boolean getStatus() {
+        return status;
     }
 
     @Override
-    public boolean hasSameSurname(AbstractStudent student) {
-        return student.getSurname().equals(surname);
-    }
-
-    @Override
-    public synchronized void setStudying(boolean status) {
-        this.studying = status;
+    public synchronized void setStatus(Boolean status) {
+        this.status = status;
     }
 }

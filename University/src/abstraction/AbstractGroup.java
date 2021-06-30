@@ -16,9 +16,11 @@ public interface AbstractGroup {
 
     List<AbstractStudent> getStudentsByCity(String city) throws StudentNotFoundException;
 
-    int getCourse();
+    Integer getCourse();
 
     String getName();
+
+    void setCourse(Integer course);
 
     boolean contains(AbstractStudent student);
 }
